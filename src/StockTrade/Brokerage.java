@@ -81,7 +81,6 @@ public class Brokerage implements Login
             user.receiveMessage("Welcome to SafeTrade!");
         }
 
-        //how do I open the window
         user.openWindow();
         activeUsers.add(user);
         return 0;
