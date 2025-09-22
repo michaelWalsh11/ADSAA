@@ -3,7 +3,7 @@ package StockTrade;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class Trader
+public class Trader implements Comparable<Trader>
 {
 
     private Brokerage brokerage;
@@ -11,13 +11,14 @@ public class Trader
     private String password;
     private TraderWindow myWindow;
 
-    private Queue<String> mailbox = new LinkedList<>();
+    private Queue<String> mailbox;
 
     public Trader(Brokerage brokerage, String name, String pswd)
     {
         this.brokerage = brokerage;
         this.name = name;
         this.password = pswd;
+        this.mailbox = new LinkedList<>();
     }
 
     public String getName() {
@@ -63,7 +64,7 @@ public class Trader
 
     public boolean hasMessages()
     {
-        return mailbox.isEmpty();
+        return !mailbox.isEmpty();
     }
 
     public void receiveMessage(String msg)

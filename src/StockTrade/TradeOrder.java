@@ -39,5 +39,8 @@ public class TradeOrder {
     }
     public boolean isSell(){return !buyOrder;}
 
-    public void subtractShares(int shares) {numShares -= shares;}
+    public void subtractShares(int shares)
+    {
+        numShares -= shares;
+    }
 }

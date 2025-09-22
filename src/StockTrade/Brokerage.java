@@ -1,22 +1,18 @@
 package StockTrade;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 
 public class Brokerage implements Login
 {
     private StockExchange exchange;
-    private TreeMap<String, Trader> userList;
+    private Map<String, Trader> userList;
     private Set<Trader> activeUsers;
-    private TraderWindow window;
 
     public Brokerage(StockExchange exchange)
     {
         this.exchange = exchange;
         userList = new TreeMap<>();
-        activeUsers = new HashSet<>();
+        activeUsers = new TreeSet<>();
     }
 
     public int addUser(String userName, String password)
@@ -40,7 +36,7 @@ public class Brokerage implements Login
 
     public int login(String userName, String password)
     {
-        Trader tempUser = new Trader(this, userName, password);
+        Trader user = userList.get(userName);
 
         if (!userList.containsKey(userName))
         {
@@ -50,26 +46,30 @@ public class Brokerage implements Login
         {
             return -2;
         }
-        else if (activeUsers.contains(tempUser))
+        else if (activeUsers.contains(user))
         {
             return -3;
         }
 
+        if (!user.hasMessages())
+        {
+            user.receiveMessage("Welcome to SafeTrade!");
+        }
+
         //how do I open the window
-        tempUser.openWindow();
-        activeUsers.add(tempUser);
+        user.openWindow();
+        activeUsers.add(user);
         return 0;
     }
 
     public void getQuote(String ticker, Trader trader)
     {
-        trader.receiveMessage(trader.getName() +
-                " placed an order for " + ticker + ".");
+        trader.receiveMessage(exchange.getQuote(ticker));
     }
 
     public void placeOrder(TradeOrder order)
     {
-        this.exchange.placeOrder(order);
+        exchange.placeOrder(order);
     }
 
     public void logout(Trader trader)

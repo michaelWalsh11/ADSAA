@@ -12,7 +12,7 @@ public class Stock {
     private String ticker;
     private double lowestSellPriceDay;
     private double highestSellPriceDay;
-    private double volume;
+    private int volume;
     private double lastPrice;
 
     //looked up some notation for comparators but really just pressed buttons until it worked.
@@ -25,7 +25,7 @@ public class Stock {
         this.ticker = ticker;
         this.lowestSellPriceDay = price;
         this.highestSellPriceDay = price;
-        this.volume = 0.0;
+        this.volume = 0;
         this.lastPrice = price;
 
         buy = new PriorityQueue<>(
@@ -66,63 +66,100 @@ public class Stock {
 
     public void placeOrder(TradeOrder order)
     {
+        Trader trader = order.getTrader();
+        String buyOrSell = "Sell";
         if (order.isBuyOrder())
         {
-            TradeOrder topSell = sell.peek();
-            if (topSell != null && order.getPrice() >= topSell.getPrice())
-            {
-                lastPrice = order.getPrice();
-                int traded = Math.min(order.getNumShares(), topSell.getNumShares());
-
-                order.subtractShares(traded);
-                topSell.subtractShares(traded);
-
-                volume += traded;
-
-                if (topSell.getNumShares() == 0)
-                {
-                    sell.poll();
-                }
-
-                if (order.getNumShares() > 0)
-                {
-                    placeOrder(order);
-                }
-            }
-            else
-            {
-                buy.add(order);
-            }
+            buyOrSell = "Buy";
         }
-        else
+
+        String price = "market";
+        if (!order.isMarket())
         {
-            TradeOrder topBuy = buy.peek();
-            if (topBuy != null && order.getPrice() <= topBuy.getPrice())
+            price = String.valueOf(order.getPrice());
+        }
+
+        trader.receiveMessage("New order: " + buyOrSell + " " + ticker
+                            + " (" + name + ")\n" + order.getNumShares() +
+                            " shares at " + price);
+
+        if (order.isBuyOrder())
+        {
+            buy.add(order);
+        }
+        else {
+            sell.add(order);
+        }
+
+        while (!buy.isEmpty() && !sell.isEmpty())
+        {
+            TradeOrder buyOrder = buy.peek();
+            TradeOrder sellOrder = sell.peek();
+
+            double buyPrice = Double.MAX_VALUE;
+            if (!buyOrder.isMarket())
             {
-                lastPrice = order.getPrice();
-                int traded = Math.min(order.getNumShares(), topBuy.getNumShares());
+                buyPrice = buyOrder.getPrice();
+            }
 
-                order.subtractShares(traded);
-                topBuy.subtractShares(traded);
+            double sellPrice = 0.0;
+            if (!sellOrder.isMarket())
+            {
+                sellPrice = sellOrder.getPrice();
+            }
 
-                volume += traded;
+            if (buyPrice < sellPrice) {
+                break;
+            }
 
-                if (topBuy.getNumShares() == 0)
-                {
-                    buy.poll();
-                }
+            int sharesTraded = Math.min(buyOrder.getNumShares(), sellOrder.getNumShares());
 
-                if (order.getNumShares() > 0)
-                {
-                    placeOrder(order);
-                }
+            double tradePrice;
+            if (buyOrder.isMarket() && sellOrder.isMarket())
+            {
+                tradePrice = lastPrice;
+            }
+            else if (buyOrder.isMarket())
+            {
+                tradePrice = sellOrder.getPrice();
+            }
+            else if (sellOrder.isMarket())
+            {
+                tradePrice = buyOrder.getPrice();
             }
             else
             {
-                sell.add(order);
+                tradePrice = sellOrder.getPrice();
+            }
+
+            lastPrice = tradePrice;
+            if (lastPrice > highestSellPriceDay)
+            {
+                highestSellPriceDay = lastPrice;
+            }
+
+            if (lastPrice < lowestSellPriceDay)
+            {
+                lowestSellPriceDay = lastPrice;
+            }
+            volume += sharesTraded;
+
+            buyOrder.getTrader().receiveMessage(
+                    "Trade: " + sharesTraded + " shares of " + ticker + " at " + tradePrice);
+            sellOrder.getTrader().receiveMessage(
+                    "Trade: " + sharesTraded + " shares of " + ticker + " at " + tradePrice);
+
+            buyOrder.subtractShares(sharesTraded);
+            sellOrder.subtractShares(sharesTraded);
+
+            if (buyOrder.getNumShares() == 0)
+            {
+                buy.remove();
+            }
+            if (sellOrder.getNumShares() == 0)
+            {
+                sell.remove();
             }
         }
-
-        System.out.println(getQuote());
     }
 }
