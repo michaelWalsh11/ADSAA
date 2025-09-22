@@ -3,6 +3,9 @@ package StockTrade;
 import java.util.LinkedList;
 import java.util.Queue;
 
+/**
+ * Represents a stock trader.
+ */
 public class Trader implements Comparable<Trader>
 {
 
@@ -30,6 +33,11 @@ public class Trader implements Comparable<Trader>
         return password;
     }
 
+    /**
+     * Compares this trader to another by comparing their screen names case blind.
+     * @param other the object to be compared.
+     * @return
+     */
     public int compareTo(Trader other)
     {
         String tn = this.getName().toLowerCase();
@@ -48,6 +56,11 @@ public class Trader implements Comparable<Trader>
         return 0;
     }
 
+    /**
+     * Indicates whether some other trader is "equal to" this one, based on comparing their screen names case blind.
+     * @param other the other object to compare to
+     * @return
+     */
     public boolean equals(Object other)
     {
         String tn = this.getName().toLowerCase();
@@ -56,6 +69,9 @@ public class Trader implements Comparable<Trader>
         return tn.equals(on);
     }
 
+    /**
+     * Creates a new TraderWindow for this trader and saves a reference to it in myWindow.
+     */
     public void openWindow()
     {
         myWindow = new TraderWindow(this);
@@ -67,6 +83,10 @@ public class Trader implements Comparable<Trader>
         return !mailbox.isEmpty();
     }
 
+    /**
+     * Adds msg to this trader's mailbox and displays all messages.
+     * @param msg the message to add
+     */
     public void receiveMessage(String msg)
     {
         mailbox.add(msg);
@@ -76,22 +96,36 @@ public class Trader implements Comparable<Trader>
         }
     }
 
+    /**
+     * Requests a quote for a given stock symbol from the brokerage by calling brokerage's getQuote.
+     * @param symbol the ticker of the stock
+     */
     public void getQuote(String symbol)
     {
         brokerage.getQuote(symbol, this);
     }
 
+    /**
+     * Places a given order with the brokerage by calling brokerage's placeOrder.
+     * @param order
+     */
     public void placeOrder(TradeOrder order)
     {
         brokerage.placeOrder(order);
     }
 
+    /**
+     * Logs out the trader
+     */
     public void quit()
     {
         brokerage.logout(this);
         myWindow = null;
     }
 
+    /**
+     * Helper method that shows all the messages in the mailbox and shows them.
+     */
     private void removeAndShow()
     {
         while(!mailbox.isEmpty())
