@@ -1,8 +1,20 @@
 package Chapter26;
-/*
-  Implements a priority queue based on a min-heap.
+
+/**
+ * HONOR PLEDGE: All work here is honestly obtained and is my own.  Signed:  Michael Walsh
+ * @author walshm
+ * Date of Completion:  10/23/2025
+ * <p>
+ * Assignment:   	HeapPriorityQueue
+ * <p>
+ * Attribution: I worked solo.
+ * <p>
+ * General Description:   This was not a very difficult assignment in my opinion
+ *                        I believe this works and heaps up and down (in theory)
+ *                        without failure.
  */
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.NoSuchElementException;
 
@@ -99,12 +111,59 @@ public class HeapPriorityQueue
 
   private void reheapDown()
   {
+        int index = 1;
+        int childIndex;
 
+        while(items[index * 2] != null)
+        {
+            int left = index * 2;
+            int right = index * 2 + 1;
+            //find the smaller child node
+            if (lessThan(items[left], items[right]))
+            {
+                childIndex = left;
+            }
+            else
+            {
+                childIndex = right;
+            }
+
+            //is the part sorted
+            if (lessThan(items[index], items[childIndex]))
+            {
+                items[numItems + 1] = null;
+                return;
+            }
+
+            //swap if not
+            swap(childIndex, index);
+        }
+      items[numItems + 1] = null;
   }
 
   private void reheapUp()
   {
+        int index = numItems;
 
+        while(index != 1)
+        {
+            int parentIndex = index / 2;
+            if (lessThan(items[index], items[parentIndex]))
+            {
+                swap(index, parentIndex);
+            }
+            else {
+                return;
+            }
+            index = index / 2;
+        }
+  }
+
+  private void swap(int index1, int index2)
+  {
+      Object temp = items[index1];
+      items[index1] = items[index2];
+      items[index2] = temp;
   }
 
   private void growCapacity()
@@ -112,6 +171,11 @@ public class HeapPriorityQueue
     Object[] tempItems = new Object[2 * items.length - 1];
     System.arraycopy(items, 0, tempItems, 0, items.length);
     items = tempItems;
+  }
+
+  public String toString()
+  {
+      return Arrays.toString(items);
   }
 }
 
