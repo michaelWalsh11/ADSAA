@@ -7,14 +7,14 @@ public class Message
 {
     private int priority;
     private String message;
-    private Time timeOfArrival;
+    private int timeOfArrival;
 
-    public Message(String message)
+    public Message(String message, int min)
     {
         priority = (int)(Math.random() * 5);
         this.message = message;
 
-        timeOfArrival = new Time(new Date().getTime());
+        timeOfArrival = min;
     }
     // int 0-4 (0 = highest priority)
     public int getPriority()
@@ -28,7 +28,7 @@ public class Message
         return "Priority: " + priority + "  " + message + " TimeOfArrival " + timeOfArrival;
     }
 
-    public Time getTimeOfArrival()
+    public int getTimeOfArrival()
     {
         return timeOfArrival;
     }

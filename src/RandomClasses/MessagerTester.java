@@ -7,7 +7,7 @@ public class MessagerTester
         MessagePriorityQueue queue = new MessagePriorityQueue();
         for (int x = 0; x < 8; x++)
         {
-            Message message = new Message("Arbitrary text!");
+            Message message = new Message("Arbitrary text!", 0);
             queue.add(message);
         }
 
